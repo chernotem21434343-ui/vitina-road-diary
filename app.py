@@ -19,6 +19,7 @@ def create_app(test_config=None):
         DATABASE=os.environ.get("DATABASE", str(BASE_DIR / "vitina_road.db")),
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
+        SESSION_COOKIE_SECURE=os.environ.get("PUBLIC_HTTPS", "0") == "1",
         MAX_CONTENT_LENGTH=1_000_000,
     )
     if test_config:
