@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: vitina-road
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: waitress-serve --listen=0.0.0.0:$PORT --call app:create_app
+    envVars:
+      - key: ACCESS_PIN
+        generateValue: true
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE
+        value: /opt/render/project/src/data/vitina_road.db
+    disk:
+      name: vitina-road-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
