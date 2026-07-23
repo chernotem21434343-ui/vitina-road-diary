@@ -57,7 +57,7 @@
       </form>
       <div id="passwordReveal" class="auth-panel hidden">
         <div class="panel-kicker">Твой личный ключ</div><h2>Сохрани этот пароль</h2>
-        <p>Он показывается один раз. С ним ты будешь входить на любом устройстве.</p>
+        <p>Это твой уникальный код из четырёх цифр. Он показывается один раз — сохрани его для входа с любого устройства.</p>
         <div id="newPassword" class="password-reveal"></div>
         <button id="copyPassword" class="ghost auth-wide" type="button">Скопировать пароль</button>
         <button id="continueAfterRegister" class="primary auth-wide" type="button">Я сохранил пароль</button>
@@ -66,7 +66,7 @@
         <div class="panel-kicker">Возвращение</div><h2>С возвращением</h2>
         <p>Введи своё имя и личный пароль.</p>
         <input id="loginName" class="auth-input" placeholder="Имя" autocomplete="username" required>
-        <input id="password" class="auth-input" type="password" placeholder="Пароль" autocomplete="current-password" required>
+        <input id="password" class="auth-input" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="4 цифры" autocomplete="current-password" required>
         <button class="primary auth-wide" type="submit">Открыть дневник</button>
         <div id="loginError" class="login-error"></div><button id="backFromLogin" class="link-button" type="button">Назад</button>
       </form>

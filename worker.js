@@ -17,11 +17,15 @@ function randomHex(size = 32) {
   const bytes = crypto.getRandomValues(new Uint8Array(size));
   return [...bytes].map(b => b.toString(16).padStart(2, "0")).join("");
 }
-function generatedPassword() {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const bytes = crypto.getRandomValues(new Uint8Array(12));
-  const raw = [...bytes].map(b => alphabet[b % alphabet.length]).join("");
-  return `${raw.slice(0, 4)}-${raw.slice(4, 8)}-${raw.slice(8)}`;
+async function generatedPassword(env) {
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const value = crypto.getRandomValues(new Uint32Array(1))[0];
+    const password = String(1000 + (value % 9000));
+    const fingerprint = await sha256(password);
+    const exists = await env.DB.prepare("SELECT id FROM users WHERE password_fingerprint=?").bind(fingerprint).first();
+    if (!exists) return { password, fingerprint };
+  }
+  throw new Error("Не удалось создать уникальный код");
 }
 function cookieValue(request, name) {
   for (const part of (request.headers.get("cookie") || "").split(";")) {
@@ -80,10 +84,10 @@ async function api(request, env, url) {
     if (await rateLimited(env, "registration_attempts", ip, 3600, 5)) return json({ error: "Слишком много регистраций. Попробуй позже." }, 429);
     const data = await requestBody(request), name = String(data.name || "").trim();
     if (!validName(name)) return json({ error: "Имя: от 2 до 32 букв, цифр, пробелов или дефисов" }, 400);
-    const password = generatedPassword(), salt = randomHex(16), createdAt = new Date().toISOString();
+    const credentials = await generatedPassword(env), password = credentials.password, salt = randomHex(16), createdAt = new Date().toISOString();
     try {
-      const result = await env.DB.prepare("INSERT INTO users(name,password_hash,password_salt,created_at) VALUES(?,?,?,?)")
-        .bind(name, await sha256(`${salt}:${password}`), salt, createdAt).run();
+      const result = await env.DB.prepare("INSERT INTO users(name,password_hash,password_salt,created_at,password_fingerprint) VALUES(?,?,?,?,?)")
+        .bind(name, await sha256(`${salt}:${password}`), salt, createdAt, credentials.fingerprint).run();
       await env.DB.prepare("INSERT INTO registration_attempts(ip,attempted_at) VALUES(?,?)").bind(ip, Math.floor(Date.now() / 1000)).run();
       const userId = Number(result.meta.last_row_id), token = await createSession(env, userId);
       return json({ ok: true, user: { id: userId, name }, password }, 201, { "set-cookie": sessionCookie(token) });
