@@ -65,7 +65,7 @@ function dateAtMoscow(date) { return new Intl.DateTimeFormat("en-CA", { timeZone
 
 async function archiveFor(env, userId, today) {
   const result = await env.DB.prepare(`
-    SELECT d.date,d.statement,d.created_at,COUNT(t.id) AS thought_count,MAX(t.created_at) AS last_activity
+    SELECT d.date,d.statement,d.created_at,d.relapsed,d.relapse_at,COUNT(t.id) AS thought_count,MAX(t.created_at) AS last_activity
     FROM user_days d LEFT JOIN user_thoughts t ON t.user_id=d.user_id AND t.day_date=d.date
     WHERE d.user_id=? GROUP BY d.date ORDER BY d.date DESC
   `).bind(userId).all();
@@ -73,7 +73,7 @@ async function archiveFor(env, userId, today) {
   const existing = new Set(days.map(d => d.date));
   let cursor = new Date(`${today}T12:00:00+03:00`), streak = 0;
   while (existing.has(dateAtMoscow(cursor))) { streak++; cursor = new Date(cursor.getTime() - 86400000); }
-  return { days, stats: { days: days.length, thoughts: days.reduce((s, d) => s + Number(d.thought_count || 0), 0), streak } };
+  return { days, stats: { days: days.length, thoughts: days.reduce((s, d) => s + Number(d.thought_count || 0), 0), relapses: days.reduce((s, d) => s + Number(d.relapsed || 0), 0), streak } };
 }
 
 async function api(request, env, url) {
@@ -125,14 +125,15 @@ async function api(request, env, url) {
     const result = await env.DB.prepare(`
       SELECT u.id,u.name,u.created_at,
         (SELECT COUNT(*) FROM user_days d WHERE d.user_id=u.id) AS days,
-        (SELECT COUNT(*) FROM user_thoughts t WHERE t.user_id=u.id) AS thoughts
+        (SELECT COUNT(*) FROM user_thoughts t WHERE t.user_id=u.id) AS thoughts,
+        (SELECT COUNT(*) FROM user_days r WHERE r.user_id=u.id AND r.relapsed=1) AS relapses
       FROM users u ORDER BY u.name COLLATE NOCASE
     `).all();
     return json({ users: result.results || [], current_user_id: user.id });
   }
 
   if (path === "/api/today" && method === "GET") {
-    const day = await env.DB.prepare("SELECT date,statement,created_at FROM user_days WHERE user_id=? AND date=?").bind(user.id, today).first();
+    const day = await env.DB.prepare("SELECT date,statement,created_at,relapsed,relapse_at FROM user_days WHERE user_id=? AND date=?").bind(user.id, today).first();
     return json({ date: today, started: Boolean(day), day: day || null, user });
   }
 
@@ -160,6 +161,19 @@ async function api(request, env, url) {
     return json({ id: result.meta.last_row_id, text, created_at: createdAt }, 201);
   }
 
+  if (path === "/api/relapse" && method === "POST") {
+    const markedAt = new Date().toISOString();
+    const existing = await env.DB.prepare("SELECT date,relapsed FROM user_days WHERE user_id=? AND date=?").bind(user.id, today).first();
+    if (existing?.relapsed) return json({ error: "Этот день уже отмечен" }, 409);
+    if (!existing) {
+      await env.DB.prepare("INSERT INTO user_days(user_id,date,statement,created_at,relapsed,relapse_at) VALUES(?,?,?,?,1,?)")
+        .bind(user.id, today, "Сегодня был трудный день. Я признаю это и продолжаю путь.", markedAt, markedAt).run();
+    } else {
+      await env.DB.prepare("UPDATE user_days SET relapsed=1,relapse_at=? WHERE user_id=? AND date=?").bind(markedAt, user.id, today).run();
+    }
+    return json({ ok: true, date: today, relapsed: true, relapse_at: markedAt }, 201);
+  }
+
   if (path === "/api/archive" && method === "GET") {
     const selectedId = Number(url.searchParams.get("user_id") || user.id);
     const selected = await env.DB.prepare("SELECT id,name,created_at FROM users WHERE id=?").bind(selectedId).first();
@@ -170,7 +184,7 @@ async function api(request, env, url) {
   if (path.startsWith("/api/days/") && method === "GET") {
     const date = decodeURIComponent(path.slice(10)), selectedId = Number(url.searchParams.get("user_id") || user.id);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ error: "Некорректная дата" }, 400);
-    const day = await env.DB.prepare("SELECT date,statement,created_at FROM user_days WHERE user_id=? AND date=?").bind(selectedId, date).first();
+    const day = await env.DB.prepare("SELECT date,statement,created_at,relapsed,relapse_at FROM user_days WHERE user_id=? AND date=?").bind(selectedId, date).first();
     if (!day) return json({ error: "В этот день записей нет" }, 404);
     const thoughts = await env.DB.prepare("SELECT id,text,created_at FROM user_thoughts WHERE user_id=? AND day_date=? ORDER BY created_at,id").bind(selectedId, date).all();
     const selected = await env.DB.prepare("SELECT id,name FROM users WHERE id=?").bind(selectedId).first();
