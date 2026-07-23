@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#07140f">
-  <title>Витина дорога в счастливое будущее</title>
+  <title>Попробуй себе докажи</title>
   <style>
     :root{--night:#07140f;--night-2:#0b2017;--sage:#27634a;--sage-2:#163d2d;--lime:#b9f36a;--gold:#f5c85b;--chalk:#edf8ef;--muted:#9bb3a4;--line:rgba(237,248,239,.16);--panel:rgba(9,32,23,.93);--danger:#ff8b7b;--shadow:0 24px 80px rgba(0,0,0,.36);--radius:24px}
     *{box-sizing:border-box} html{background:var(--night);scroll-behavior:smooth} body{margin:0;min-height:100vh;color:var(--chalk);font-family:"Trebuchet MS",Segoe UI,sans-serif;background:radial-gradient(circle at 52% -8%,#2c7252 0,transparent 38%),linear-gradient(180deg,#07140f,#0a1b14 52%,#06110d);overflow-x:hidden}
@@ -33,32 +33,57 @@
     @media(max-width:900px){.hero{grid-template-columns:1fr;padding-top:40px}.hero-badge{display:none}.dashboard{grid-template-columns:1fr}.quote-strip{grid-template-columns:auto 1fr}.quote-next{grid-column:2}.shell{width:min(100% - 20px,720px)}h1{font-size:clamp(43px,13vw,68px)}.panel-head{padding:21px}.reflection-space{margin:16px;padding:20px}.spotlight{width:65vw}.journeybar{position:sticky;top:8px;z-index:20}.brand-mini span{display:none}}
     @media(max-width:520px){.shell{width:100%;padding:8px 8px 45px}.hero{padding:42px 9px 26px;min-height:330px}.journeybar{border-radius:13px}.panel{border-radius:18px}.panel-head{align-items:start;flex-direction:column}.stats{grid-template-columns:repeat(3,1fr)}.stat{padding:16px 5px}.stat strong{font-size:25px}.calendar-wrap{padding:15px}.cal-grid{gap:4px}.cal-day{border-radius:8px}.form-row{align-items:stretch;flex-direction:column}.primary{width:100%}.quote-strip{padding:18px 8px}.quote-mark{display:none}.quote-strip{grid-template-columns:1fr}.quote-next{grid-column:1;text-align:left}}
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.animated-title{animation:none;opacity:1;transform:none;filter:none}.pulse{display:none}.primary{transition:none}}
+
+    .auth-wide{width:100%;margin-top:10px}.auth-input{width:100%;height:54px;margin:7px 0;padding:0 15px;border-radius:13px;border:1px solid var(--line);background:#06140e;color:white;outline:0}.auth-input:focus{border-color:var(--lime)}.link-button{border:0;background:none;color:var(--muted);margin-top:15px;text-decoration:underline;cursor:pointer}.auth-card{max-width:480px}.auth-panel h2{margin:8px 0}.password-reveal{font:700 25px Consolas,monospace;letter-spacing:.12em;color:var(--lime);padding:20px 8px;margin:17px 0;background:rgba(185,243,106,.08);border:1px dashed rgba(185,243,106,.5);border-radius:14px;word-break:break-word}.user-picker{display:flex;justify-content:space-between;align-items:end;gap:15px;padding:20px 22px;border-bottom:1px solid var(--line)}.user-select{min-width:220px;margin-top:6px;padding:11px 35px 11px 13px;border-radius:11px;border:1px solid var(--line);background:#071a11;color:white;outline:0}.user-summary{color:var(--muted);font-size:11px;text-align:right}.progress-chart{display:flex;align-items:end;gap:4px;height:62px;margin:18px 0 4px;padding:8px 5px;border-bottom:1px solid var(--line)}.progress-bar{flex:1;min-width:4px;background:linear-gradient(180deg,var(--lime),#2f8d5b);border-radius:4px 4px 0 0;opacity:.85}.progress-label{font:9px Consolas,monospace;color:var(--muted);text-align:center}
   </style>
 </head>
 <body>
   <div class="noise"></div><div class="spotlight left"></div><div class="spotlight right"></div>
   <div id="loginModal" class="modal">
-    <form id="loginForm" class="login-card">
-      <div class="login-emblem">⚽</div>
-      <h2>Продолжить путь</h2>
-      <p>Личный дневник защищён кодом доступа.<br>Каждый день — новый шаг к себе.</p>
-      <input id="pin" class="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••" aria-label="Код доступа" required>
-      <button class="primary" type="submit">Открыть дневник</button>
-      <div id="loginError" class="login-error" aria-live="polite"></div>
-    </form>
+    <div class="login-card auth-card">
+      <div class="login-emblem">✦</div>
+      <div id="authChoice">
+        <h2>Начни свою историю</h2>
+        <p>Здесь каждый день — личный шаг к свободе.<br>Выбери способ продолжить.</p>
+        <button id="showRegister" class="primary auth-wide">Создать свою страницу</button>
+        <button id="showLogin" class="ghost auth-wide">У меня уже есть пароль</button>
+      </div>
+      <form id="registerForm" class="auth-panel hidden">
+        <div class="panel-kicker">Новая страница</div><h2>Как тебя зовут?</h2>
+        <p>Имя увидят другие участники общего дневника.</p>
+        <input id="regName" class="auth-input" maxlength="32" placeholder="Твоё имя" autocomplete="name" required>
+        <button class="primary auth-wide" type="submit">Создать страницу</button>
+        <div id="registerError" class="login-error"></div><button id="backFromRegister" class="link-button" type="button">Назад</button>
+      </form>
+      <div id="passwordReveal" class="auth-panel hidden">
+        <div class="panel-kicker">Твой личный ключ</div><h2>Сохрани этот пароль</h2>
+        <p>Он показывается один раз. С ним ты будешь входить на любом устройстве.</p>
+        <div id="newPassword" class="password-reveal"></div>
+        <button id="copyPassword" class="ghost auth-wide" type="button">Скопировать пароль</button>
+        <button id="continueAfterRegister" class="primary auth-wide" type="button">Я сохранил пароль</button>
+      </div>
+      <form id="loginForm" class="auth-panel hidden">
+        <div class="panel-kicker">Возвращение</div><h2>С возвращением</h2>
+        <p>Введи своё имя и личный пароль.</p>
+        <input id="loginName" class="auth-input" placeholder="Имя" autocomplete="username" required>
+        <input id="password" class="auth-input" type="password" placeholder="Пароль" autocomplete="current-password" required>
+        <button class="primary auth-wide" type="submit">Открыть дневник</button>
+        <div id="loginError" class="login-error"></div><button id="backFromLogin" class="link-button" type="button">Назад</button>
+      </form>
+    </div>
   </div>
 
   <main id="app" class="shell hidden">
     <header class="journeybar">
-      <div class="brand-mini"><div class="journey-mark">◌</div><span>Дневник восстановления · день за днём</span></div>
+      <div class="brand-mini"><div class="journey-mark">◌</div><span>Общий дневник восстановления · день за днём</span></div>
       <div id="journeyDate" class="journey-date"></div>
       <button id="logout" class="logout">Выйти</button>
     </header>
 
     <section class="hero">
       <div>
-        <div class="eyebrow">Новая глава жизни</div>
-        <h1 id="animatedTitle" class="animated-title" aria-label="Витина дорога в счастливое будущее"></h1>
+        <div class="eyebrow">Твоя новая глава</div>
+        <h1 id="animatedTitle" class="animated-title" aria-label="Попробуй себе докажи"></h1>
         <p class="hero-copy">Не нужно менять всю жизнь за один день. <strong>Достаточно позаботиться о сегодняшнем дне.</strong> Здесь сохраняется каждый честный шаг, каждая мысль и каждый выбор в пользу свободной жизни.</p>
       </div>
       <div class="hero-badge" aria-hidden="true"><div class="pulse"></div><div><div id="heroDay" class="day-number">1</div><div class="day-caption">день пути</div></div></div>
@@ -89,8 +114,8 @@
       </section>
 
       <aside class="panel">
-        <div class="stats"><div class="stat"><strong id="statDays">0</strong><span>дней</span></div><div class="stat"><strong id="statStreak">0</strong><span>серия</span></div><div class="stat"><strong id="statThoughts">0</strong><span>мыслей</span></div></div>
-        <div class="calendar-wrap"><div class="cal-nav"><div><div class="panel-kicker">Архив пути</div><div id="calTitle" class="cal-title"></div></div><button id="goToday" class="ghost">Сегодня</button></div><div id="calendar" class="cal-grid"></div><div class="cal-legend"><span><i class="legend-dot now"></i>сегодня</span><span><i class="legend-dot"></i>есть запись</span></div></div>
+        <div class="user-picker"><div><div class="panel-kicker">Смотреть дневник</div><select id="userSelect" class="user-select" aria-label="Выбрать пользователя"></select></div><div id="userSummary" class="user-summary"></div></div><div class="stats"><div class="stat"><strong id="statDays">0</strong><span>дней</span></div><div class="stat"><strong id="statStreak">0</strong><span>серия</span></div><div class="stat"><strong id="statThoughts">0</strong><span>мыслей</span></div></div>
+        <div class="calendar-wrap"><div class="cal-nav"><div><div class="panel-kicker">Архив пути</div><div id="calTitle" class="cal-title"></div></div><button id="goToday" class="ghost">Сегодня</button></div><div id="calendar" class="cal-grid"></div><div id="progressChart" class="progress-chart"></div><div class="cal-legend"><span><i class="legend-dot now"></i>сегодня</span><span><i class="legend-dot"></i>есть запись</span></div></div>
       </aside>
     </div>
 
@@ -101,39 +126,25 @@
   </main>
   <div id="toast" class="toast" role="status"></div>
 
-<script>
-const quotes=[
-  'Трезвость не отнимает жизнь — она возвращает тебе все её цвета.',
-  'Каждое спокойное утро — медаль, которую невозможно купить.',
-  'Ты не отказываешься от зависимости. Ты выбираешь свободу.',
-  'Сегодняшний выбор строит человека, которым ты будешь гордиться завтра.',
-  'Сильный не тот, кто никогда не падал, а тот, кто выбрал подняться.',
-  'Без зависимости появляется место для мечтаний, близких и настоящей радости.',
-  'Один честный день превращается в неделю, неделя — в новую жизнь.',
-  'Твоё будущее не требует идеальности. Оно просит не сдаваться сегодня.',
-  'Трезвая жизнь — это возвращение домой, к самому себе.',
-  'Самая важная победа происходит тихо: когда ты выбираешь себя.',
-  'Пусть сегодня будет не лёгким, а настоящим и твоим.',
-  'Ты уже в пути. Каждый следующий шаг делает дорогу светлее.'
-];
-const state={today:null,archive:{days:[],stats:{}},selected:null};
-const $=s=>document.querySelector(s);
-const ruDate=d=>new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric'}).format(new Date(d+'T12:00:00'));
-const ruTime=s=>new Intl.DateTimeFormat('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(s));
-async function api(path,options={}){const res=await fetch(path,{headers:{'Content-Type':'application/json',...(options.headers||{})},...options});const data=await res.json().catch(()=>({}));if(!res.ok)throw Object.assign(new Error(data.error||'Ошибка соединения'),{status:res.status});return data}
-function toast(text){const el=$('#toast');el.textContent=text;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
-function title(){$('#animatedTitle').textContent='Витина дорога в счастливое будущее'}
-function updateQuote(){const block=Math.floor(Date.now()/600000);$('#quote').textContent=quotes[block%quotes.length];const left=600-(Math.floor(Date.now()/1000)%600);$('#quoteNext').textContent=`новая мысль через ${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`}
-function timeline(day){const box=$('#timeline');if(!day){box.innerHTML='<div class="empty">В этот день записей пока нет.</div>';return}const entries=[{created_at:day.created_at,text:day.statement,kind:'Начало дня'},...(day.thoughts||[]).map(x=>({...x,kind:'Мысль'}))];box.innerHTML=entries.map(e=>`<article class="event"><div class="event-time">${ruTime(e.created_at)} · ${e.kind}</div><div class="event-text"></div></article>`).join('');[...box.querySelectorAll('.event-text')].forEach((el,i)=>el.textContent=entries[i].text)}
-function renderCalendar(){const now=new Date(state.today.date+'T12:00:00');const y=now.getFullYear(),m=now.getMonth();$('#calTitle').textContent=new Intl.DateTimeFormat('ru-RU',{month:'long',year:'numeric'}).format(now);const archived=new Set(state.archive.days.map(x=>x.date));const first=new Date(y,m,1),count=new Date(y,m+1,0).getDate();let html=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="dow">${x}</div>`).join('');let offset=(first.getDay()+6)%7;html+='<div></div>'.repeat(offset);for(let d=1;d<=count;d++){const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const cls=iso===state.today.date?'today':archived.has(iso)?'archived':'';html+=`<button class="cal-day ${cls}" data-date="${iso}" ${cls?'':'disabled'} aria-label="${ruDate(iso)}">${d}</button>`}$('#calendar').innerHTML=html;document.querySelectorAll('.cal-day.archived,.cal-day.today').forEach(b=>b.addEventListener('click',()=>selectDay(b.dataset.date)))}
-async function selectDay(date){try{const day=await api('/api/days/'+date);state.selected=date;$('#timelineTitle').textContent=`${ruDate(date)} · ${day.thoughts.length+1} событий`;$('#showToday').classList.toggle('hidden',date===state.today.date);timeline(day);if(date!==state.today.date)document.querySelector('.timeline-panel').scrollIntoView({behavior:'smooth'})}catch(e){if(e.status===404){state.selected=date;$('#timelineTitle').textContent=ruDate(date);timeline(null)}}}
-async function refresh(){state.today=await api('/api/today');state.archive=await api('/api/archive');state.selected=state.today.date;$('#journeyDate').textContent=ruDate(state.today.date).toUpperCase();$('#todayLabel').textContent=ruDate(state.today.date);$('#statDays').textContent=state.archive.stats.days;$('#statStreak').textContent=state.archive.stats.streak;$('#statThoughts').textContent=state.archive.stats.thoughts;$('#heroDay').textContent=Math.max(1,state.archive.stats.days);$('#startState').classList.toggle('hidden',state.today.started);$('#activeState').classList.toggle('hidden',!state.today.started);if(state.today.started){$('#activeStatement').textContent=state.today.day.statement;$('#activeTime').textContent=`Зафиксировано в ${ruTime(state.today.day.created_at)}`;await selectDay(state.today.date)}else{$('#timelineTitle').textContent='События сегодняшнего дня';timeline(null)}renderCalendar()}
-$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();$('#loginError').textContent='';try{await api('/api/login',{method:'POST',body:JSON.stringify({pin:$('#pin').value})});$('#pin').value='';$('#loginModal').classList.add('hidden');$('#app').classList.remove('hidden');await refresh()}catch(err){$('#loginError').textContent=err.message}})
-$('#logout').addEventListener('click',async()=>{await api('/api/logout',{method:'POST'});location.reload()});
-$('#startDay').addEventListener('click',async()=>{const btn=$('#startDay');$('#startError').textContent='';btn.disabled=true;try{await api('/api/days',{method:'POST',body:JSON.stringify({date:state.today.date,statement:$('#statement').value})});toast('Первый шаг сохранён. Сегодня ты выбрал себя.');await refresh()}catch(e){$('#startError').textContent=e.message}finally{btn.disabled=false}});
-$('#thoughtForm').addEventListener('submit',async e=>{e.preventDefault();const text=$('#thought').value.trim();$('#thoughtError').textContent='';if(!text)return;const btn=e.currentTarget.querySelector('button');btn.disabled=true;try{await api('/api/thoughts',{method:'POST',body:JSON.stringify({date:state.today.date,text})});$('#thought').value='';toast('Мысль сохранена в истории дня');await refresh()}catch(err){$('#thoughtError').textContent=err.message}finally{btn.disabled=false}});
-$('#showToday').addEventListener('click',()=>selectDay(state.today.date));$('#goToday').addEventListener('click',()=>selectDay(state.today.date));
-(async function init(){title();updateQuote();setInterval(updateQuote,1000);const session=await api('/api/session');if(session.authenticated){$('#loginModal').classList.add('hidden');$('#app').classList.remove('hidden');await refresh()}})();
-</script>
+<script>const quotes=['Трезвость возвращает жизни все её цвета.','Каждое спокойное утро — шаг к себе.','Ты выбираешь свободу, и это уже победа.','Один честный день превращается в новую жизнь.','Будущее начинается с решения, которое ты принимаешь сегодня.','Твоя история не обязана быть идеальной — она должна быть твоей.','Сила — это разрешить себе начать заново.','Ты уже в пути. Дорога становится светлее с каждым шагом.'];
+const state={today:null,archive:{days:[],stats:{}},users:[],currentUser:null,selectedUserId:null,selected:null};const $=s=>document.querySelector(s);const ruDate=d=>new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric'}).format(new Date(d+'T12:00:00'));const ruTime=s=>new Intl.DateTimeFormat('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date(s));
+async function api(path,options={}){const res=await fetch(path,{credentials:'include',headers:{'Content-Type':'application/json',...(options.headers||{})},...options});const data=await res.json().catch(()=>({}));if(!res.ok)throw Object.assign(new Error(data.error||'Ошибка соединения'),{status:res.status});return data}
+function toast(text){const e=$('#toast');e.textContent=text;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3000)}
+function title(){$('#animatedTitle').textContent='Попробуй себе докажи';$('#animatedTitle').setAttribute('aria-label','Попробуй себе докажи')}
+function updateQuote(){const b=Math.floor(Date.now()/600000);$('#quote').textContent=quotes[b%quotes.length];const l=600-(Math.floor(Date.now()/1000)%600);$('#quoteNext').textContent=`новая мысль через ${Math.floor(l/60)}:${String(l%60).padStart(2,'0')}`}
+function openApp(){ $('#loginModal').classList.add('hidden');$('#app').classList.remove('hidden') }
+function showAuth(which){['authChoice','registerForm','loginForm','passwordReveal'].forEach(x=>$('#'+x).classList.toggle('hidden',x!==which))}
+function timeline(day){const box=$('#timeline');if(!day){box.innerHTML='<div class="empty">В этот день записей пока нет.</div>';return}const es=[{created_at:day.created_at,text:day.statement,kind:'Отметка дня'},...(day.thoughts||[]).map(x=>({...x,kind:'Мысль'}))];$('#timelineTitle').textContent=`${day.user?.name||''} · ${ruDate(day.date)} · ${es.length} событий`;box.innerHTML=es.map(e=>`<article class="event"><div class="event-time">${ruTime(e.created_at)} · ${e.kind}</div><div class="event-text"></div></article>`).join('');[...box.querySelectorAll('.event-text')].forEach((e,i)=>e.textContent=es[i].text)}
+function renderUsers(){const sel=$('#userSelect');sel.innerHTML=state.users.map(u=>`<option value="${u.id}">${u.name}${u.id===state.currentUser.id?' · это ты':''}</option>`).join('');sel.value=String(state.selectedUserId);const u=state.users.find(x=>x.id===state.selectedUserId);$('#userSummary').textContent=u?`${u.days||0} дней · ${u.thoughts||0} мыслей`:''}
+function renderChart(){const holder=$('#progressChart'), days=state.archive.days.slice(0,14).reverse();if(!days.length){holder.innerHTML='';return}holder.innerHTML=days.map(d=>`<div class="progress-bar" style="height:${Math.min(100,Math.max(12,(Number(d.thought_count)+1)*18))}%" title="${d.date}: ${d.thought_count} мыслей"></div>`).join('')}
+function renderCalendar(){const now=new Date(state.today.date+'T12:00:00'),y=now.getFullYear(),m=now.getMonth(),archived=new Set(state.archive.days.map(x=>x.date)),own=Number(state.selectedUserId)===Number(state.currentUser.id);$('#calTitle').textContent=new Intl.DateTimeFormat('ru-RU',{month:'long',year:'numeric'}).format(now);let h=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="dow">${x}</div>`).join('');const first=new Date(y,m,1),offset=(first.getDay()+6)%7;h+='<div></div>'.repeat(offset);for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,active=own&&iso===state.today.date,has=archived.has(iso),cls=active?'today':has?'archived':'';h+=`<button class="cal-day ${cls}" data-date="${iso}" ${cls?'':'disabled'}>${d}</button>`}$('#calendar').innerHTML=h;document.querySelectorAll('.cal-day.today,.cal-day.archived').forEach(b=>b.onclick=()=>selectDay(b.dataset.date))}
+async function selectDay(date){try{const day=await api(`/api/days/${date}?user_id=${state.selectedUserId}`);state.selected=date;$('#showToday').classList.toggle('hidden',date===state.today.date&&Number(state.selectedUserId)===Number(state.currentUser.id));timeline(day)}catch(e){timeline(null)}}
+async function loadSelected(){state.archive=await api(`/api/archive?user_id=${state.selectedUserId}`);$('#statDays').textContent=state.archive.stats.days;$('#statStreak').textContent=state.archive.stats.streak;$('#statThoughts').textContent=state.archive.stats.thoughts;$('#heroDay').textContent=Math.max(1,state.archive.stats.days);renderUsers();renderCalendar();renderChart();await selectDay(state.today.date)}
+async function refresh(){const session=await api('/api/session');if(!session.authenticated){showAuth('authChoice');return}state.currentUser=session.user;state.today=await api('/api/today');const list=await api('/api/users');state.users=list.users;state.selectedUserId=state.selectedUserId||state.currentUser.id;$('#journeyDate').textContent=ruDate(state.today.date).toUpperCase();$('#todayLabel').textContent=ruDate(state.today.date);$('#startState').classList.toggle('hidden',state.today.started);$('#activeState').classList.toggle('hidden',!state.today.started);if(state.today.started){$('#activeStatement').textContent=state.today.day.statement;$('#activeTime').textContent=`Зафиксировано в ${ruTime(state.today.day.created_at)}`}else timeline(null);openApp();await loadSelected()}
+$('#showRegister').onclick=()=>showAuth('registerForm');$('#showLogin').onclick=()=>showAuth('loginForm');$('#backFromRegister').onclick=()=>showAuth('authChoice');$('#backFromLogin').onclick=()=>showAuth('authChoice');$('#copyPassword').onclick=()=>{navigator.clipboard?.writeText($('#newPassword').textContent);toast('Пароль скопирован')};$('#continueAfterRegister').onclick=()=>refresh();
+$('#registerForm').onsubmit=async e=>{e.preventDefault();$('#registerError').textContent='';try{const r=await api('/api/register',{method:'POST',body:JSON.stringify({name:$('#regName').value.trim()})});$('#newPassword').textContent=r.password;showAuth('passwordReveal');toast('Страница создана')}catch(x){$('#registerError').textContent=x.message}};
+$('#loginForm').onsubmit=async e=>{e.preventDefault();$('#loginError').textContent='';try{await api('/api/login',{method:'POST',body:JSON.stringify({name:$('#loginName').value.trim(),password:$('#password').value})});await refresh()}catch(x){$('#loginError').textContent=x.message}};
+$('#logout').onclick=async()=>{await api('/api/logout',{method:'POST',body:'{}'});location.reload()};$('#userSelect').onchange=async e=>{state.selectedUserId=Number(e.target.value);await loadSelected()};$('#showToday').onclick=()=>{state.selectedUserId=state.currentUser.id;loadSelected()};$('#goToday').onclick=()=>{state.selectedUserId=state.currentUser.id;loadSelected()};$('#startDay').onclick=async()=>{const b=$('#startDay');$('#startError').textContent='';b.disabled=true;try{await api('/api/days',{method:'POST',body:JSON.stringify({date:state.today.date,statement:$('#statement').value})});toast('Сегодняшний день сохранён');await refresh()}catch(x){$('#startError').textContent=x.message}finally{b.disabled=false}};$('#thoughtForm').onsubmit=async e=>{e.preventDefault();const t=$('#thought').value.trim();if(!t)return;try{await api('/api/thoughts',{method:'POST',body:JSON.stringify({date:state.today.date,text:t})});$('#thought').value='';toast('Мысль сохранена');await refresh()}catch(x){$('#thoughtError').textContent=x.message}};
+(async()=>{title();updateQuote();setInterval(updateQuote,1000);try{await refresh()}catch(e){showAuth('authChoice')}})();</script>
 </body>
 </html>
